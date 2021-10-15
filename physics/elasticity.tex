@@ -1,0 +1,91 @@
+\documentclass[a4paper, 12pt]{report}
+\addtolength{\evensidemargin}{-5.3cm}
+\addtolength{\oddsidemargin}{-1,5cm}
+\addtolength{\textwidth}{3cm}
+\addtolength{\textheight}{5cm}
+\addtolength{\topmargin}{-1cm}
+\addtolength{\headheight}{-2cm}
+\usepackage[utf8]{inputenc}
+\usepackage{amsthm,amsfonts}
+\usepackage{centernot}
+\usepackage{mathtools}
+\usepackage{graphicx}
+
+\begin{document}
+\title{Elasticity}
+\maketitle
+
+\section{Begin}
+Let a continuum material $V$. Let $\mathbf r$ be some position inside, and, after some operation (deformation, translation, rotation, etc), such point moves to $\mathbf r'$. The displacement is defined as $\mathbf u = \mathbf x' - \mathbf x$. Of course, $\mathbf u = \mathbf u(\mathbf r)$.
+
+Distances after operation are then:
+\begin{equation}
+\begin{array}{ll}
+d\ell'^2 &= dx_i' dx_i' \\
+&= \displaystyle  (dx_i + du_i)(dx_i + du_i) \\
+&= \displaystyle dx_i dx_i + 2 dx_i du_i + du_i du_i \\
+&= \displaystyle  dx_i dx_i + 2 \frac{\partial u_i}{\partial x_j} dx_i dx_j + \frac{\partial u_i}{\partial x_j}\frac{\partial u_i}{\partial x_k} dx_j dx_k \\
+&= \displaystyle  dx_i dx_i + \left(\frac{\partial u_i}{\partial x_j} + \frac{\partial u_j}{\partial x_i}\right) dx_i dx_j + \frac{\partial u_k}{\partial x_i}\frac{\partial u_k}{\partial x_j} dx_i dx_j \\
+&= \displaystyle  d\ell^2 + \left(\frac{\partial u_i}{\partial x_j} + \frac{\partial u_j}{\partial x_i} + \frac{\partial u_k}{\partial x_i}\frac{\partial u_k}{\partial x_j}\right) dx_i dx_j \\
+&= \displaystyle  (\delta_{ij} + 2u_{ij}) dx_i dx_j\
+\end{array}
+\end{equation}
+
+
+Define Strain Tensor:
+\begin{equation}
+u_{ij} = \frac{1}{2}\left(\frac{\partial u_i}{\partial x_j} + \frac{\partial u_j}{\partial x_i} + \frac{\partial u_k}{\partial x_i}\frac{\partial u_k}{\partial x_j}\right)
+\end{equation}
+
+At the principal axis, if $u = diag(u^{(i)})$, then $dx_i^2 = (1 + 2u^{(i)})dx_i^2$. This implies:
+\begin{equation}
+\begin{array}{ll}
+\text{Principal Axis:}& dx_i' = \sqrt{1 + 2u^{(i)}} dx_i \\
+\text{Relative Extension:}& \frac{dx_i' - dx_i}{dx_i} = \sqrt{1 + 2u^{(i)}} - 1\approx \left(1 + u^{(i)} - \frac{1}{2}(u^{(i)})^2\right) - 1\approx u^{(i)} \\
+\end{array}
+\end{equation}
+
+
+\subsection{Force}
+Let each component of the force density $F_i$ come from a gradient:
+\begin{equation}
+F_i = \frac{\partial\sigma_{ik}}{\partial x_k}
+\end{equation}
+
+Then, total force:
+\begin{equation}
+\int F_i dV = \int \frac{\partial\sigma_{ik}}{\partial x_k} dV = \oint\sigma_{ik} dS_k
+\end{equation}
+
+Moment is then:
+\begin{equation}
+\begin{array}{ll}
+M_{ik} &= \displaystyle\int\left(F_i x_k - F_k x_i\right) dV \\
+&= \displaystyle\int\left(\frac{\partial\sigma_{il}}{\partial x_l} x_k - \frac{\partial\sigma_{kl}}{\partial x_l} x_i\right) dV \\
+&= \displaystyle\int\frac{\partial}{\partial x_l}\left(\sigma_{il} x_k - \sigma_{kl} x_i\right) dV - \int\left(\sigma_{il}\delta_{kl} - \sigma_{kl}\delta_{il}\right) dV \\
+&= \displaystyle\oint\left(\sigma_{il} x_k - \sigma_{kl} x_i\right) dS_l - \int\left(\sigma_{ik} - \sigma_{ki}\right) dV \\
+\end{array}
+\end{equation}
+
+
+\subsection{Thermodynamics}
+After a displacement $\delta u_i$ due to force density $F_i$, the work density is:
+\begin{equation}
+\delta R = F_i\delta u_i
+= \frac{\partial\sigma_{ik}}{\partial x_k}\delta u_i
+= \frac{\partial}{\partial x_k}\left(\sigma_{ik}\delta u_i\right) - \sigma_{ik}\frac{\partial\delta u_i}{\delta x_k}
+\end{equation}
+
+Work is then:
+\begin{equation}
+\begin{array}{ll}
+W &= \displaystyle \oint\left(\sigma_{ik}\delta u_i\right) dS_k - \int\sigma_{ik}\frac{\partial\delta u_i}{\delta x_k} dV \\
+&= \displaystyle \oint\left(\sigma_{ik}\delta u_i\right) dS_k - \int\sigma_{ik}\frac{1}{2}\left(\frac{\partial\delta u_i}{\partial x_k} + \frac{\partial\delta u_k}{\partial x_i}\right) dV \\
+&= \displaystyle \oint\left(\sigma_{ik}\delta u_i\right) dS_k - \frac{1}{2}\int\sigma_{ik}\delta\left(\frac{\partial u_i}{\delta x_k} + \frac{\partial u_k}{\partial x_i}\right) dV \\
+&= \displaystyle \oint\left(\sigma_{ik}\delta u_i\right) dS_k - \int\sigma_{ik}\delta u_{ik} dV \\
+\end{array}
+\end{equation}
+
+In a continuum where $\sigma_{ik} = 0$ at the boundary (say, an infinite one), then $\delta R = -\sigma_{ik}\delta u_{ik}$.
+
+\end{document}
