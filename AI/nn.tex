@@ -1,0 +1,90 @@
+\documentclass[a4paper, 12pt]{report}
+\addtolength{\evensidemargin}{-5.3cm}
+\addtolength{\oddsidemargin}{-1,5cm}
+\addtolength{\textwidth}{3cm}
+\addtolength{\textheight}{5cm}
+\addtolength{\topmargin}{-1cm}
+\addtolength{\headheight}{-2cm}
+\usepackage[utf8]{inputenc}
+\usepackage{amsthm,amsfonts}
+\usepackage{centernot}
+\usepackage{mathtools}
+\usepackage{graphicx}
+
+\begin{document}
+\title{Neural Networks}
+\maketitle
+
+\section{Neural Networks}
+Let a network with $L$ layers. At each layer: $\ell\in\{1, 2, \cdots, L\}$, we have weights and bias:
+\begin{equation}
+\begin{array}{ll}
+z^{[\ell]} &= W^{[\ell]} a^{[\ell-1]} + b^{[\ell]} \\
+a^{[\ell]} &= g^{[\ell]}(z^{[\ell]})
+\end{array}
+\end{equation}
+
+If at layer $\ell$, let the number of units at such layer be denoted by $n^{[\ell]}$, then it makes sense:
+\begin{equation}
+a^{[\ell]}\in\mathbb{R}^{n^{[\ell]}},\quad\quad
+b^{[\ell]}\in\mathbb{R}^{n^{[\ell]}},\quad\quad
+W^{[\ell]}\in\mathbb{R}^{n^{[\ell]}\times n^{[\ell-1]}}\quad\quad
+g^{[\ell]}: \mathbb{R}\to\mathbb{R}
+\end{equation}
+
+The only exception for $g$ is the last layer, which might be $g^{[L]}: \mathbb{R}^{n^{[L]}}\to\mathbb{R}^{n^{[L]}}$ (example, softmax activation).
+The network prediction $\hat y$ is precisely the output at the last layer, $\hat y = a^{[L]}$. From there, define the loss function, comparing the predicted value $\hat y$ with the actual value $y$:
+\begin{equation}
+\begin{array}{lll}
+\mathcal L(y, \hat y) &= -y\log\hat y - (1-y)\log(1-\hat y)\quad&\text{(Logistic loss)} \\
+\mathcal L(y, \hat y) &= -\sum_i y_i\log\hat y_i\quad&\text{(Categorical cross-entropy loss)} \\
+\mathcal L(y, \hat y) &= \frac{1}{2}(y-\hat y)^T(y-\hat y)&\text{(Quadratic Loss)} \\
+\end{array}
+\end{equation}
+
+Note categorical cross-entropy loss is exactly the cross-entropy between two distributions. Also note it is a generalization of logistic loss for more than two labels. If there are $m$ training examples, define the cost function:
+\begin{equation}
+\mathcal J(W,b) = \sum_m\mathcal L(y_m, \hat y_m)
+\end{equation}
+
+From there, the gradients follow.
+\begin{equation}
+\frac{\partial\mathcal J}{\partial W^{[\ell]}_{ij}} = \sum_k\frac{\partial\mathcal J}{\partial a^{[\ell]}_{k}}\frac{\partial a^{[\ell]}_{k}}{\partial W^{[\ell]}_{ij}},\quad\quad
+\frac{\partial a^{[\ell]}_{k}}{\partial W^{[\ell]}_{ij}} = \sum_s\frac{\partial a^{[L]}_{k}}{\partial z^{[\ell]}_s}\frac{\partial z^{[\ell]}_s}{\partial W^{[\ell]}_{ij}},\quad\quad
+J^{[\ell]}_{ij} = \frac{\partial g_i}{\partial z_j} = \frac{\partial a^{[\ell]}_{i}}{\partial z^{[\ell]}_j}
+\end{equation}
+
+\begin{equation}
+\frac{\partial\mathcal J}{\partial a^{[\ell]}_i}
+=\sum_j\frac{\partial\mathcal J}{\partial a^{[\ell+1]}_j}\frac{\partial a^{[\ell+1]}_j}{\partial a^{[\ell]}_i}
+=\sum_j\sum_k\frac{\partial\mathcal J}{\partial a^{[\ell+1]}_j}\frac{\partial a^{[\ell+1]}_j}{\partial z^{[\ell+1]}_k}\frac{\partial z^{[\ell+1]}_k}{\partial a^{[\ell]}_i}
+=\sum_j\sum_k\frac{\partial\mathcal J}{\partial a^{[\ell+1]}_j}J^{[\ell+1]}_{jk}\frac{\partial z^{[\ell+1]}_k}{\partial a^{[\ell]}_i}
+\end{equation}
+
+\begin{equation}
+\frac{\partial\mathcal J}{\partial W^{[\ell]}_{ij}} 
+= \sum_k\frac{\partial\mathcal J}{\partial a^{[\ell]}_{k}}\frac{\partial a^{[\ell]}_{k}}{\partial W^{[\ell]}_{ij}}
+= \sum_k\sum_s\frac{\partial\mathcal J}{\partial a^{[\ell]}_{k}}\frac{\partial a^{[\ell]}_{k}}{\partial z^{[\ell]}_s}\frac{\partial z^{[\ell]}_s}{\partial W^{[\ell]}_{ij}}
+= \sum_k\sum_s\frac{\partial\mathcal J}{\partial a^{[\ell]}_{k}}J^{[\ell]}_{ks}\frac{\partial z^{[\ell]}_s}{\partial W^{[\ell]}_{ij}}
+\end{equation}
+
+\begin{equation}
+\frac{\partial z_s^{[\ell]}}{\partial W^{[\ell]}_{ij}}
+=\frac{\partial}{\partial W^{[\ell]}_{ij}}\left[\sum_l W^{[\ell]}_{sl} a^{[\ell-1]}_{l}+b^{[\ell]}_s\right]
+=\sum_l\frac{\partial W^{[\ell]}_{sl}}{\partial W^{[\ell]}_{ij}} a^{[\ell-1]}_{l}
+= \sum_l\delta_{si}\delta_{jl} a^{[\ell-1]}_{l} = a^{[\ell-1]}_j\delta_{si}
+\end{equation}
+
+\begin{equation}
+\frac{\partial z^{[\ell+1]}_k}{\partial a^{[\ell]}_i}
+= \frac{\partial}{\partial a^{[\ell]}_i}\left[\sum_l W^{[\ell+1]}_{kl} a^{[\ell]}_l + b^{[\ell]}_k\right]
+= \sum_l W_{kl}^{[\ell+1]}\frac{\partial a_l^{[\ell]}}{\partial a_i^{[\ell]}}
+= \sum_l W_{kl}^{[\ell+1]}\delta_{il}
+= W_{ki}^{[\ell+1]}
+\end{equation}
+
+
+
+
+
+\end{document}
