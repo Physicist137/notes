@@ -44,47 +44,70 @@ The network prediction $\hat y$ is precisely the output at the last layer, $\hat
 
 Note categorical cross-entropy loss is exactly the cross-entropy between two distributions. Also note it is a generalization of logistic loss for more than two labels. If there are $m$ training examples, define the cost function:
 \begin{equation}
-\mathcal J(W,b) = \sum_m\mathcal L(y_m, \hat y_m)
+J(W,b) = \sum_m\mathcal L(y_m, \hat y_m)
 \end{equation}
 
-From there, the gradients follow.
+The immediate gradients are thus:
 \begin{equation}
-\frac{\partial\mathcal J}{\partial W^{[\ell]}_{ij}} = \sum_k\frac{\partial\mathcal J}{\partial a^{[\ell]}_{k}}\frac{\partial a^{[\ell]}_{k}}{\partial W^{[\ell]}_{ij}},\quad\quad
-\frac{\partial a^{[\ell]}_{k}}{\partial W^{[\ell]}_{ij}} = \sum_s\frac{\partial a^{[L]}_{k}}{\partial z^{[\ell]}_s}\frac{\partial z^{[\ell]}_s}{\partial W^{[\ell]}_{ij}},\quad\quad
-J^{[\ell]}_{ij} = \frac{\partial g_i}{\partial z_j} = \frac{\partial a^{[\ell]}_{i}}{\partial z^{[\ell]}_j}
+\begin{array}{ll}
+\displaystyle\frac{\partial z_i^{[\ell]}}{\partial W^{[\ell]}_{jk}}
+&=\displaystyle\frac{\partial}{\partial W^{[\ell]}_{jk}}\left[\sum_l W^{[\ell]}_{il} a^{[\ell-1]}_{l}+b^{[\ell]}_i\right]
+=\displaystyle\sum_l\frac{\partial W^{[\ell]}_{il}}{\partial W^{[\ell]}_{jk}} a^{[\ell-1]}_{l}
+=\displaystyle\sum_l\delta_{ij}\delta_{lk} a^{[\ell-1]}_{l} = a^{[\ell-1]}_k\delta_{ij}
+\\
+\displaystyle\frac{\partial z^{[\ell]}_i}{\partial a^{[\ell-1]}_j}
+&=\displaystyle\frac{\partial}{\partial a^{[\ell-1]}_j}\left[\sum_l W^{[\ell]}_{il} a^{[\ell-1]}_l + b^{[\ell]}_j\right]
+= \displaystyle\sum_l W_{il}^{[\ell]}\frac{\partial a_l^{[\ell-1]}}{\partial a_j^{[\ell-1]}}
+= \displaystyle\sum_l W_{il}^{[\ell]}\delta_{il}
+= W_{ij}^{[\ell]}
+\\
+\displaystyle\frac{\partial z^{[\ell]}_i}{\partial b^{[\ell]}_j}
+&=\displaystyle\frac{\partial}{\partial b^{[\ell]}_j}\left[\sum_l W^{[\ell]}_{il} a^{[\ell-1]}_l + b^{[\ell]}_i\right]
+= \displaystyle\frac{\partial b_i^{[\ell-1]}}{\partial b_j^{[\ell-1]}}
+= \displaystyle\delta_{ij}
+\end{array}
+\end{equation}
+
+
+Consider $J_{ij}^{[\ell]}$ is the jacobian of matrix from the activation $g^{[\ell]}$, then, a single backwards step can be computed:
+\begin{equation}
+\frac{\partial a_i^{[\ell]}}{\partial a_j^{[\ell-1]}}
+=\sum_k\frac{\partial a_i^{[\ell]}}{\partial z_k^{[\ell]}}\frac{\partial z_k^{[\ell]}}{\partial a_j^{[\ell-1]}}
+=\sum_k J_{ik}^{[\ell]} W_{kj}^{[\ell]}
+\quad\implies\quad
+\frac{\partial a^{[\ell]}}{\partial a^{[\ell-1]}} = J^{[\ell]} W^{[\ell]}
+\end{equation}
+
+
+From there, because $a^{[\ell]} = g^{[\ell]}\left(W^{[\ell]} a^{[\ell-1]} + b^{[\ell]}\right)$, backpropagation soon follows:
+\begin{equation}
+\frac{\partial\mathcal L}{\partial a_i^{[\ell]}} = 
+\sum_{k_0,k_1,\cdots k_{L-\ell+1}}
+\frac{\partial\mathcal L}{\partial a_{k_0}^{[L]}}
+\frac{\partial a_{k_0}^{[L]}}{\partial a_{k_1}^{[L-1]}}
+\frac{\partial a_{k_1}^{[L-1]}}{\partial a_{k_2}^{[L-2]}}
+\cdots
+\frac{\partial a_{k_{L-\ell+1}}^{[\ell+1]}}{\partial a_{k_{L-\ell}}^{[\ell]}}
+=
+\sum_{k_0,k_1,\cdots k_{L-\ell}}
+\frac{\partial\mathcal L}{\partial a_{k_0}^{[L]}}
+\prod_{l=0}^{L-\ell+1}
+\frac{\partial a_{k_{L-l+1}}^{[l+1]}}{\partial a_{k_{L-l}}^{[l]}}
 \end{equation}
 
 \begin{equation}
-\frac{\partial\mathcal J}{\partial a^{[\ell]}_i}
-=\sum_j\frac{\partial\mathcal J}{\partial a^{[\ell+1]}_j}\frac{\partial a^{[\ell+1]}_j}{\partial a^{[\ell]}_i}
-=\sum_j\sum_k\frac{\partial\mathcal J}{\partial a^{[\ell+1]}_j}\frac{\partial a^{[\ell+1]}_j}{\partial z^{[\ell+1]}_k}\frac{\partial z^{[\ell+1]}_k}{\partial a^{[\ell]}_i}
-=\sum_j\sum_k\frac{\partial\mathcal J}{\partial a^{[\ell+1]}_j}J^{[\ell+1]}_{jk}\frac{\partial z^{[\ell+1]}_k}{\partial a^{[\ell]}_i}
+\frac{\partial\mathcal L}{\partial W_{ij}^{[\ell]}}
+=\sum_{k}\sum_l\frac{\partial\mathcal L}{\partial a_k^{[\ell]}}\frac{\partial a_k^{[\ell]}}{\partial z_l^{[\ell]}}\frac{\partial z_l^{[\ell]}}{\partial W_{ij}^{[\ell]}}
+=\sum_k\sum_l\frac{\partial\mathcal L}{\partial a_k^{[\ell]}} J_{kl}^{[\ell]}\delta_{li}a_j^{[\ell-1]}
+= \sum_k\frac{\partial\mathcal L}{\partial a_k^{[\ell]}} J_{ki}^{[\ell]} a_j^{[\ell-1]}
 \end{equation}
 
 \begin{equation}
-\frac{\partial\mathcal J}{\partial W^{[\ell]}_{ij}} 
-= \sum_k\frac{\partial\mathcal J}{\partial a^{[\ell]}_{k}}\frac{\partial a^{[\ell]}_{k}}{\partial W^{[\ell]}_{ij}}
-= \sum_k\sum_s\frac{\partial\mathcal J}{\partial a^{[\ell]}_{k}}\frac{\partial a^{[\ell]}_{k}}{\partial z^{[\ell]}_s}\frac{\partial z^{[\ell]}_s}{\partial W^{[\ell]}_{ij}}
-= \sum_k\sum_s\frac{\partial\mathcal J}{\partial a^{[\ell]}_{k}}J^{[\ell]}_{ks}\frac{\partial z^{[\ell]}_s}{\partial W^{[\ell]}_{ij}}
+\frac{\partial\mathcal L}{\partial b_i^{[\ell]}}
+=\sum_{k}\sum_l\frac{\partial\mathcal L}{\partial a_k^{[\ell]}}\frac{\partial a_k^{[\ell]}}{\partial z_l^{[\ell]}}\frac{\partial z_l^{[\ell]}}{\partial b_i^{[\ell]}}
+=\sum_k\sum_l\frac{\partial\mathcal L}{\partial a_k^{[\ell]}} J_{kl}^{[\ell]}\delta_{li}
+= \sum_k\frac{\partial\mathcal L}{\partial a_k^{[\ell]}} J_{ki}^{[\ell]}
 \end{equation}
-
-\begin{equation}
-\frac{\partial z_s^{[\ell]}}{\partial W^{[\ell]}_{ij}}
-=\frac{\partial}{\partial W^{[\ell]}_{ij}}\left[\sum_l W^{[\ell]}_{sl} a^{[\ell-1]}_{l}+b^{[\ell]}_s\right]
-=\sum_l\frac{\partial W^{[\ell]}_{sl}}{\partial W^{[\ell]}_{ij}} a^{[\ell-1]}_{l}
-= \sum_l\delta_{si}\delta_{jl} a^{[\ell-1]}_{l} = a^{[\ell-1]}_j\delta_{si}
-\end{equation}
-
-\begin{equation}
-\frac{\partial z^{[\ell+1]}_k}{\partial a^{[\ell]}_i}
-= \frac{\partial}{\partial a^{[\ell]}_i}\left[\sum_l W^{[\ell+1]}_{kl} a^{[\ell]}_l + b^{[\ell]}_k\right]
-= \sum_l W_{kl}^{[\ell+1]}\frac{\partial a_l^{[\ell]}}{\partial a_i^{[\ell]}}
-= \sum_l W_{kl}^{[\ell+1]}\delta_{il}
-= W_{ki}^{[\ell+1]}
-\end{equation}
-
-
-
-
-
 \end{document}
+
+
