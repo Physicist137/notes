@@ -108,6 +108,48 @@ From there, because $a^{[\ell]} = g^{[\ell]}\left(W^{[\ell]} a^{[\ell-1]} + b^{[
 =\sum_k\sum_l\frac{\partial\mathcal L}{\partial a_k^{[\ell]}} J_{kl}^{[\ell]}\delta_{li}
 = \sum_k\frac{\partial\mathcal L}{\partial a_k^{[\ell]}} J_{ki}^{[\ell]}
 \end{equation}
+
+
+
+\newpage
+\section{Recurrent Networks (RNN)}
+A recurrent unit with a state $h$, input $x$ and output $\hat y$, follows the equation:
+\begin{equation}
+\begin{array}{ll}
+h^{\langle t\rangle} &= g_h\left(W_{hh} h^{\langle t-1\rangle} + W_{hx} x^{\langle t\rangle} + b_h\right) \\
+\hat y^{\langle t\rangle} &= g_y \left(W_{yh} h^{\langle t\rangle} + b_y\right)
+\end{array}
+\end{equation}
+
+Such that:
+\begin{equation}
+\begin{array}{c}
+x\in\mathbb{R}^{n_x},\quad\quad
+h\in\mathbb{R}^{n_h},\quad\quad
+y\in\mathbb{R}^{n_y},\quad\quad
+b_a\in\mathbb{R}^{n_a},\quad\quad
+b_y\in\mathbb{R}^{n_y},\quad\quad
+\\
+W_{ax}\in\mathbb{R}^{n_a\times n_x}\quad\quad
+W_{aa}\in\mathbb{R}^{n_a\times n_a}\quad\quad
+W_{ya}\in\mathbb{R}^{n_y\times n_a}\quad\quad
+\\
+\end{array}
+\end{equation}
+
+The loss function at time $t$:
+\begin{equation}
+\begin{array}{lll}
+\mathcal L^{\langle t\rangle}(y^{\langle t\rangle}, \hat y^{\langle t\rangle}) &= -y^{\langle t\rangle}\log\hat y^{\langle t\rangle} - (1-y^{\langle t\rangle})\log(1-\hat y^{\langle t\rangle})\quad&\text{(Logistic loss)} \\
+\mathcal L^{\langle t\rangle}(y^{\langle t\rangle}, \hat y^{\langle t\rangle}) &= -\sum_i y_i^{\langle t\rangle}\log\hat y_i^{\langle t\rangle}\quad&\text{(Categorical cross-entropy)} \\
+\mathcal L^{\langle t\rangle}(y^{\langle t\rangle}, \hat y^{\langle t\rangle}) &= \frac{1}{2}(y^{\langle t\rangle}-\hat y^{\langle t\rangle})^T(y^{\langle t\rangle}-\hat y^{\langle t\rangle})&\text{(Quadratic Loss)} \\
+\end{array}
+\end{equation}
+
+The full loss function are then defined as:
+\begin{equation}
+\mathcal L(\hat y, y) = \sum_{t=1}^{T}\mathcal L^{\langle t\rangle}(y^{\langle t\rangle}, \hat y^{\langle t\rangle}),\quad\quad
+\end{equation}
 \end{document}
 
 
