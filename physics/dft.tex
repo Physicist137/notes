@@ -1,0 +1,54 @@
+\documentclass[a4paper, 12pt]{report}
+\addtolength{\evensidemargin}{-5.3cm}
+\addtolength{\oddsidemargin}{-1,5cm}
+\addtolength{\textwidth}{3cm}
+\addtolength{\textheight}{5cm}
+\addtolength{\topmargin}{-1cm}
+\addtolength{\headheight}{-2cm}
+\usepackage[utf8]{inputenc}
+\usepackage{amsthm,amsfonts}
+\usepackage{centernot}
+\usepackage{mathtools}
+\usepackage{graphicx}
+
+\begin{document}
+\title{DFT}
+\maketitle
+
+\section{Preliminaries}
+The electronic hamiltonian of an N-Body system under Born-Oppeheimer approximation:
+\begin{equation}
+\hat H = \hat T + \hat V_{ne} + \hat V_{ee}
+= -\sum_i\frac{1}{2}\nabla^2_i + \sum_i v(\mathbf r_i) + \sum_i\sum_j\frac{1}{r_{ij}},\quad\quad
+v(\mathbf r_i) = \sum_\alpha\frac{Z_\alpha}{r_{i\alpha}}
+\end{equation}
+
+\section{Hartree-Fock Theory}
+Let $\psi_i(\mathbf x)$ be an one-electron eigenstates (or base functions), where $\mathbf x$ is a spatial-spin coordinate, that is, $\mathbf x = \{\mathbf r, s\}$. Then, the N-Body system Hartree-Fock wavefunction is defined as simply being the anti-symmetrized combination of the one-electron eigenstates, or, a Slater determinant:
+\begin{equation}
+\Psi_{HF}(\mathbf x_1, \mathbf x_2, \cdots, \mathbf x_N) = \frac{1}{\sqrt{N!}}\sum_{\sigma\in S_N}(-1)^{sgn(\sigma)}\prod_{k=1}^N\psi_{\sigma(k)}(x_k)
+\end{equation}
+
+Proof of normalization $\displaystyle\int\Psi^*_{HF}\Psi_{HF} d^N\mathbf x$ thus follows:
+\begin{equation}
+\begin{array}{ll}
+&= \displaystyle\frac{1}{N!}\int\left(\sum_{\sigma\in S_N}(-1)^{sgn(\sigma)}\prod_{i=1}^N\psi_{\sigma(i)}(x_i)\right)^*\left(\sum_{\tau\in S_N}(-1)^{sgn(\sigma)}\prod_{j=1}^N\psi_{\sigma(j)}(x_j)\right)\prod_{k=1}^N dx_k \\
+&=\displaystyle\frac{1}{N!}\int\sum_{\sigma\in S_N}\sum_{\tau\in S_N}(-1)^{sgn\sigma+sgn\tau}\prod_{i=1}^N\psi^*_{\sigma(i)}(x_i)\prod_{j=1}^N\psi_{\tau(j)}(x_j)\prod_{k=1}^N d^3\mathbf x_k \\
+&=\displaystyle\frac{1}{N!}\sum_{\sigma\in S_N}\sum_{\tau\in S_N}(-1)^{sgn\sigma+sgn\tau}\int\prod_{i=1}^N\psi^*_{\sigma(i)}(x_i)\psi_{\tau(i)}(x_i) d^3\mathbf x_i \\
+&=\displaystyle\frac{1}{N!}\sum_{\sigma\in S_N}\sum_{\tau\in S_N}(-1)^{sgn\sigma+sgn\tau}\prod_{i=1}^N\int\psi^*_{\sigma(i)}(x_i)\psi_{\tau(i)}(x_i) d^3\mathbf x_i \\
+&=\displaystyle\frac{1}{N!}\sum_{\sigma\in S_N}\sum_{\tau\in S_N}(-1)^{sgn\sigma+sgn\tau}\prod_{i=1}^N\delta_{\sigma(i),\tau(i)} \\
+&=\displaystyle\frac{1}{N!}\sum_{\sigma\in S_N}\sum_{\tau\in S_N}(-1)^{sgn\sigma+sgn\tau}\delta_{\sigma,\tau} \\
+&=\displaystyle\frac{1}{N!}\sum_{\sigma\in S_N}(-1)^{sgn\sigma+sgn\sigma} \\
+&=\displaystyle\frac{1}{N!}\sum_{\sigma\in S_N}1 \\
+&=1 \\
+\end{array}
+\end{equation}
+
+Because:
+\begin{equation}
+\prod_{i=1}^N\delta_{\sigma(i),\tau(i)}\neq 0\quad\implies\quad
+\sigma(i)=\tau(i),\forall i\in\{1,\cdots,N\}\quad\implies\quad
+\sigma = \tau
+\end{equation}
+
+\end{document}
