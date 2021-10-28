@@ -150,6 +150,29 @@ The full loss function are then defined as:
 \begin{equation}
 \mathcal L(\hat y, y) = \sum_{t=1}^{T}\mathcal L^{\langle t\rangle}(y^{\langle t\rangle}, \hat y^{\langle t\rangle}),\quad\quad
 \end{equation}
+
+Using the $z$-convention from before to represent the argument inside the activations, the gradients are then computed easily:
+\begin{equation}
+\frac{\partial h^{\langle t\rangle}}{\partial h^{\langle t-1\rangle}}
+=\left.\frac{\partial h^{\langle t\rangle}}{\partial z^{\langle t\rangle}}\right|_{z=z^{\langle t\rangle}}\frac{\partial z^{\langle t\rangle}}{\partial h^{\langle t-1\rangle}}
+=J_h(z^{\langle t\rangle}) W_{hh}
+\end{equation}
+\begin{equation}
+\frac{\partial h^{\langle t\rangle}}{\partial h^{\langle k\rangle}}
+=\prod_{i=t}^{k+1}\frac{\partial h^{\langle i\rangle}}{\partial h^{\langle i-1\rangle}}
+=\prod_{i=t}^{k+1} J_h(z^{\langle i-1\rangle}) W_{hh}
+\end{equation}
+\begin{equation}
+\frac{\partial\mathcal L^{\langle t\rangle}}{\partial\theta}
+=\sum_{k=1}^t
+\frac{\partial\mathcal L}{\partial\hat y^{\langle t\rangle}}
+\frac{\partial\hat y^{\langle t\rangle}}{\partial h^{\langle t\rangle}}
+\frac{\partial h^{\langle t\rangle}}{\partial h^{\langle k\rangle}}
+\frac{\partial h^{\langle k\rangle}}{\partial\theta}
+\end{equation}
+
+The jacobian $J_h$ of the activation $g_h$ must receive the input at time $t$ from where it was taken.
+The reason for the summation, is due to the parameter $\theta$, for instance, $W_{hh}$, appearing several times due to the recursive call.
 \end{document}
 
 
